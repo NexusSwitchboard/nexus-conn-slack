@@ -21,6 +21,7 @@
     "@slack/webhook": "^5.0.2",
     "assert": "^2.0.0",
     "debug": "^4.1.1",
+    "uuid": "^3.4.0",
     "@nexus-switchboard/nexus-extend": "~0.4.3"
   },
   "devDependencies": {
