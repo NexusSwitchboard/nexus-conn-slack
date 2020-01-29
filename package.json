@@ -1,6 +1,7 @@
 {
   "name": "@nexus-switchboard/nexus-conn-slack",
   "version": "0.1.1",
+  "keywords": ["nexus-connection"],
   "description": "Wrapper around a slack client that provides nexus connection interfaces.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
