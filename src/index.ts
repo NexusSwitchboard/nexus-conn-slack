@@ -8,7 +8,7 @@ import SlackMessageAdapter, {
 } from "@slack/interactive-messages/dist/adapter";
 import {createEventAdapter} from "@slack/events-api";
 import {createMessageAdapter} from "@slack/interactive-messages";
-import {WebClient} from "@slack/web-api";
+import {WebClient, Block, KnownBlock} from "@slack/web-api";
 import {IncomingWebhook} from "@slack/webhook";
 import axios, {AxiosError, AxiosResponse} from "axios";
 import {Router} from "express";
@@ -35,6 +35,7 @@ export interface ISlackAckResponse {
     code: number;
     body?: Record<string, any>;
     response_action?: string;
+    response_type?: string;
     errors?: string[];
 }
 
@@ -47,6 +48,8 @@ export interface ISlackMessageResponse {
 export type SlackPayload = {
     [index: string]: any
 };
+
+export type SlackBlock = Block | KnownBlock;
 
 export interface ISlackCommand {
     command: string;
@@ -282,7 +285,7 @@ export class SlackConnection extends Connection {
             inclusive: true
         });
 
-        const messages = history ? history.messages as Array<Record<string, any>> : undefined;
+        const messages = history ? history.messages as Record<string, any>[] : undefined;
 
         if (!messages || messages.length === 0) {
             return undefined;
