@@ -1,23 +1,23 @@
-import assert from "assert";
+import assert from 'assert';
 
-import {SlackEventAdapter} from "@slack/events-api/dist/adapter";
+import { SlackEventAdapter } from '@slack/events-api/dist/adapter';
 import SlackMessageAdapter, {
     ActionConstraints,
     OptionsConstraints,
     ViewConstraints
-} from "@slack/interactive-messages/dist/adapter";
-import {createEventAdapter} from "@slack/events-api";
-import {createMessageAdapter} from "@slack/interactive-messages";
-import {WebClient, Block, KnownBlock} from "@slack/web-api";
-import {IncomingWebhook} from "@slack/webhook";
-import axios, {AxiosError, AxiosResponse} from "axios";
-import {Router} from "express";
-import {Connection, ConnectionConfig, findProperty} from "@nexus-switchboard/nexus-extend";
-import {createCommandAdapter, SlackCommandAdapter} from "./slackCommandAdapter";
+} from '@slack/interactive-messages/dist/adapter';
+import { createEventAdapter } from '@slack/events-api';
+import { createMessageAdapter } from '@slack/interactive-messages';
+import { WebClient, Block, KnownBlock } from '@slack/web-api';
+import { IncomingWebhook } from '@slack/webhook';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { Router } from 'express';
+import { Connection, ConnectionConfig, findProperty } from '@nexus-switchboard/nexus-extend';
+import { createCommandAdapter, SlackCommandAdapter } from './slackCommandAdapter';
 
-import createDebug from "debug";
+import createDebug from 'debug';
 
-export const logger = createDebug("nexus:connection:slack");
+export const logger = createDebug('nexus:connection:slack');
 
 interface ICommandInfo {
     command: string;
@@ -32,11 +32,11 @@ export type SlackMessage = {
 };
 
 export interface ISlackAckResponse {
-    code: number;
+    code?: number;
     body?: Record<string, any>;
     response_action?: string;
     response_type?: string;
-    errors?: string[];
+    errors?: Record<string, any>;
 }
 
 export interface ISlackMessageResponse {
@@ -58,10 +58,10 @@ export interface ISlackCommand {
 }
 
 export enum SlackInteractionType {
-    action = "action",
-    option = "option",
-    viewSubmission = "viewSubmission",
-    viewClosed = "viewClosed"
+    action = 'action',
+    option = 'option',
+    viewSubmission = 'viewSubmission',
+    viewClosed = 'viewClosed'
 }
 
 export interface ISlackInteractionHandler {
@@ -125,7 +125,7 @@ export type SlackWebApiResponse = Record<string, any>;
  */
 export class SlackConnection extends Connection {
 
-    public name = "Slack";
+    public name = 'Slack';
     public config: ISlackAppConfig;
     public eventAdapter: SlackEventAdapter;
     public messageAdapter: SlackMessageAdapter;
@@ -159,7 +159,7 @@ export class SlackConnection extends Connection {
             }
 
             // now register the route with the configured router object.
-            this.config.router.use("/slack/events", this.eventAdapter.expressMiddleware());
+            this.config.router.use('/slack/events', this.eventAdapter.expressMiddleware());
         }
 
         if (!this.messageAdapter && this.config.interactionListeners) {
@@ -170,7 +170,7 @@ export class SlackConnection extends Connection {
             }
 
             // now register the route with the configured router object.
-            this.config.router.use("/slack/interactions", this.messageAdapter.expressMiddleware());
+            this.config.router.use('/slack/interactions', this.messageAdapter.expressMiddleware());
         }
 
         if (!this.commandsAdapter && this.config.commands) {
@@ -209,7 +209,7 @@ export class SlackConnection extends Connection {
         try {
             await this.incomingWebhooks[slackChannel].send(payload);
         } catch (e) {
-            logger("Slack IncomingWebhook post failed with " + e.message);
+            logger('Slack IncomingWebhook post failed with ' + e.message);
         }
     }
 
@@ -221,7 +221,7 @@ export class SlackConnection extends Connection {
     public extractTextFromPayload(payload: SlackPayload): string[] {
         let text: string[] = [];
         Object.keys(payload).forEach((k: string) => {
-            if (["pretext", "text"].indexOf(k) > -1) {
+            if (['pretext', 'text'].indexOf(k) > -1) {
                 text.push(payload[k]);
             } else if (payload[k] === Object(payload[k])) {
                 text = text.concat(this.extractTextFromPayload(payload[k]));
@@ -248,7 +248,7 @@ export class SlackConnection extends Connection {
         if (threadMessages && threadMessages.ok) {
             return threadMessages.messages;
         } else {
-            throw new Error("Unable to get the channel thread.  Failed with this error: " + threadMessages.error);
+            throw new Error('Unable to get the channel thread.  Failed with this error: ' + threadMessages.error);
         }
     }
 
@@ -260,16 +260,16 @@ export class SlackConnection extends Connection {
      * @param msg The message object to search.
      */
     public async getParentThread(msg: SlackMessage): Promise<string> {
-        const threadTs = findProperty(msg, "thread_ts");
+        const threadTs = findProperty(msg, 'thread_ts');
         if (threadTs) {
             return threadTs;
         } else {
-            const ts = findProperty(msg, "ts");
-            const channel = findProperty(msg, "channel");
+            const ts = findProperty(msg, 'ts');
+            const channel = findProperty(msg, 'channel');
 
             if (channel && ts) {
                 const fullMessage = await this.getMessageFromChannelAndTs(channel, ts);
-                return findProperty(fullMessage, "thread_ts");
+                return findProperty(fullMessage, 'thread_ts');
             }
         }
 
@@ -316,7 +316,7 @@ export class SlackConnection extends Connection {
 
         const responseUrl = slackRequestData.response_url;
         if (!responseUrl) {
-            throw new Error("The given slack message does not have a response URL");
+            throw new Error('The given slack message does not have a response URL');
         }
 
         return axios.post(responseUrl, messageResponseData)
@@ -349,18 +349,18 @@ export class SlackConnection extends Connection {
                       subCommands: SlackSubCommandList, defaultSubCommand?: string): boolean {
 
         if (command in this.commands) {
-            throw new Error("You cannot add the same command twice to a Command Adapter");
+            throw new Error('You cannot add the same command twice to a Command Adapter');
         }
 
-        this.commands[command] = {command, subCommands};
+        this.commands[command] = { command, subCommands };
 
         const subCommandNames = Object.keys(subCommands);
         if (subCommandNames.length === 0) {
-            throw new Error("You have to specify at least one sub-command even if there's only one.  It will be " +
-                "used as the default sub-command so the user will never have to enter it.");
+            throw new Error('You have to specify at least one sub-command even if there\'s only one.  It will be ' +
+                'used as the default sub-command so the user will never have to enter it.');
         }
         if (defaultSubCommand && !(defaultSubCommand in subCommands)) {
-            throw new Error("You have specified a default sub-command that is not in the list of sub-commands");
+            throw new Error('You have specified a default sub-command that is not in the list of sub-commands');
         }
 
         if (!defaultSubCommand && subCommandNames.length === 1) {
@@ -374,19 +374,22 @@ export class SlackConnection extends Connection {
 
         // add the route that will handle the slack command request.
         router.post(commandRoute, async (req, res) => {
-            if (!req.body.text) {
-                // this is nto a proper slack request so pretend there's nothing here.
-                return res.status(404);
+            if (req.body.text === undefined) {
+                // this is not a proper slack request so pretend there's nothing here.
+                return res.json({
+                    code: 400,
+                    message: "Invalid slack request"
+                });
             }
 
-            const parts = req.body.text.split(" ");
-            let actionStr = parts.length === 0 ? "" : parts[0].toLowerCase();
-            let textAfterSubCommand = "";
+            const parts = req.body.text.split(' ');
+            let actionStr = parts.length === 0 ? '' : parts[0].toLowerCase();
+            let textAfterSubCommand = '';
             if (actionStr && !(actionStr in subCommands)) {
                 // in this case there's something after the command but it's not one of the subcommands
                 //  so treat it as if there's no subcommand..
-                actionStr = "";
-                textAfterSubCommand = parts.join(" ");
+                actionStr = '';
+                textAfterSubCommand = parts.join(' ');
                 if (defaultSubCommand) {
                     actionStr = defaultSubCommand;
                 }
@@ -400,17 +403,17 @@ export class SlackConnection extends Connection {
                 // in this case there is a valid subcommand.  So the only
                 //  thing we have to do is grab the text  after the subcommand to
                 //  pass into the subcommand handler.
-                textAfterSubCommand = parts.length > 1 ? parts.slice(1) : "";
+                textAfterSubCommand = parts.length > 1 ? parts.slice(1) : '';
             }
 
             if (!actionStr) {
                 return res.json({
                     text: `:x: *You must provide one of the following actions: 
-                                ${Object.keys(subCommands).join(",")}*`
+                                ${Object.keys(subCommands).join(',')}*`
                 });
             }
 
-            assert(actionStr in subCommands, "Received Slack command event but requested action not defined in module config");
+            assert(actionStr in subCommands, 'Received Slack command event but requested action not defined in module config');
             const actionFunc = subCommands[actionStr];
 
             // we call the command and exclude the first word in the body of the text (if a command was given).
@@ -429,7 +432,7 @@ export class SlackConnection extends Connection {
 
     private addEvent(name: string) {
         if (!this.eventAdapter) {
-            throw new Error("Trying to add an event without calling connect first");
+            throw new Error('Trying to add an event without calling connect first');
         }
 
         this.eventAdapter.on(name, (eventPayload) => {
@@ -439,29 +442,33 @@ export class SlackConnection extends Connection {
 
     private addInteraction(handler: ISlackInteractionHandler) {
         if (!this.messageAdapter) {
-            throw new Error("Trying to add an interaction handler without calling connect first");
+            throw new Error('Trying to add an interaction handler without calling connect first');
         }
 
         if (handler.type === SlackInteractionType.action) {
             this.messageAdapter.action(handler.matchingConstraints, async (payload, _respond) => {
-                handler.handler(this, payload).catch((err) => logger("actions handler failed: " + err.toString()));
+                handler.handler(this, payload).catch((err) => logger('actions handler failed: ' + err.toString()));
             });
         } else if (handler.type === SlackInteractionType.option) {
             this.messageAdapter.options(handler.matchingConstraints as OptionsConstraints,
                 async (payload) => {
-                    handler.handler(this, payload).catch((err) => logger("options handler failed: " + err.toString()));
+                    handler.handler(this, payload).catch((err) => logger('options handler failed: ' + err.toString()));
                 });
         } else if (handler.type === SlackInteractionType.viewClosed) {
             this.messageAdapter.viewClosed(handler.matchingConstraints as ViewConstraints,
                 async (payload) => {
                     handler.handler(this, payload).catch((err) =>
-                        logger("viewClosed handler failed: " + err.toString()));
+                        logger('viewClosed handler failed: ' + err.toString()));
                 });
         } else if (handler.type === SlackInteractionType.viewSubmission) {
             this.messageAdapter.viewSubmission(handler.matchingConstraints as ViewConstraints,
-                async (payload) => {
-                    handler.handler(this, payload).catch((err) =>
-                        logger("viewSubmission handler failed: " + err.toString()));
+                (payload) => {
+                    handler.handler(this, payload)
+                        .then((ack) => {
+                            logger(ack);
+                            return ack;
+                        })
+                        .catch((err) => logger('viewSubmission handler failed: ' + err.toString()));
                 });
         }
     }
