@@ -11,7 +11,7 @@ import { createMessageAdapter } from '@slack/interactive-messages';
 import { WebClient, Block, KnownBlock } from '@slack/web-api';
 import { IncomingWebhook } from '@slack/webhook';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { Router } from 'express';
+import { Router, Application } from 'express';
 import { Connection, ConnectionConfig, findProperty } from '@nexus-switchboard/nexus-extend';
 import { createCommandAdapter, SlackCommandAdapter } from './slackCommandAdapter';
 
@@ -103,7 +103,7 @@ interface ISlackAppConfig {
     clientOAuthToken?: string;
     botUserOAuthToken?: string;
 
-    router?: Router;
+    subApp?: Application;
     eventListeners?: SlackEventList;
     interactionListeners?: ISlackInteractionHandler[];
 
@@ -159,7 +159,7 @@ export class SlackConnection extends Connection {
             }
 
             // now register the route with the configured router object.
-            this.config.router.use('/slack/events', this.eventAdapter.expressMiddleware());
+            this.config.subApp.use('/slack/events', this.eventAdapter.expressMiddleware());
         }
 
         if (!this.messageAdapter && this.config.interactionListeners) {
@@ -170,7 +170,7 @@ export class SlackConnection extends Connection {
             }
 
             // now register the route with the configured router object.
-            this.config.router.use('/slack/interactions', this.messageAdapter.expressMiddleware());
+            this.config.subApp.use('/slack/interactions', this.messageAdapter.expressMiddleware());
         }
 
         if (!this.commandsAdapter && this.config.commands) {
@@ -178,7 +178,7 @@ export class SlackConnection extends Connection {
 
             // now add all the command handlers as given in the config
             for (const cmd of this.config.commands) {
-                this.addCommand(this.config.router, cmd.command, cmd.subCommandListeners, cmd.defaultSubCommand);
+                this.addCommand(this.config.subApp, cmd.command, cmd.subCommandListeners, cmd.defaultSubCommand);
             }
         }
 
