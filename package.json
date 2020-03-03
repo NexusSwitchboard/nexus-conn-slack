@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nexus-switchboard/nexus-extend": "^0.4.6",
+    "@nexus-switchboard/nexus-extend": "^0.5",
     "@slack/events-api": "^2.3.1",
     "@slack/interactive-messages": "^1.4.1",
     "@slack/web-api": "^5.7.0",
