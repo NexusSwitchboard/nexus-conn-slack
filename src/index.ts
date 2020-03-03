@@ -12,7 +12,7 @@ import { WebClient, Block, KnownBlock } from '@slack/web-api';
 import { IncomingWebhook } from '@slack/webhook';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Router, Application } from 'express';
-import { Connection, ConnectionConfig, findProperty } from '@nexus-switchboard/nexus-extend';
+import { Connection, ConnectionConfig, GlobalConfig, findProperty } from '@nexus-switchboard/nexus-extend';
 import { createCommandAdapter, SlackCommandAdapter } from './slackCommandAdapter';
 
 import createDebug from 'debug';
@@ -475,6 +475,6 @@ export class SlackConnection extends Connection {
 
 }
 
-export default function createConnection(cfg: ConnectionConfig): Connection {
-    return new SlackConnection(cfg);
+export default function createConnection(cfg: ConnectionConfig, globalCfg: GlobalConfig): Connection {
+    return new SlackConnection(cfg, globalCfg);
 }
