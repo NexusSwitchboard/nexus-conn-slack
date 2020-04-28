@@ -8,7 +8,7 @@ import SlackMessageAdapter, {
 } from "@slack/interactive-messages/dist/adapter";
 import { createEventAdapter } from "@slack/events-api";
 import { createMessageAdapter } from "@slack/interactive-messages";
-import { WebClient, Block, KnownBlock } from "@slack/web-api";
+import { WebClient } from "@slack/web-api";
 import { IncomingWebhook } from "@slack/webhook";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Router, Application } from "express";
@@ -48,8 +48,6 @@ export interface ISlackMessageResponse {
 export type SlackPayload = {
     [index: string]: any
 };
-
-export type SlackBlock = Block | KnownBlock;
 
 export interface ISlackCommand {
     command: string;
