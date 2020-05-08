@@ -33,9 +33,11 @@ export type SlackMessage = {
 
 export interface ISlackAckResponse {
     code?: number;
+    text?: string;
     body?: Record<string, any>;
     response_action?: string;
     response_type?: string;
+    replace_original?: boolean;
     errors?: Record<string, any>;
 }
 
@@ -310,8 +312,7 @@ export class SlackConnection extends Connection {
      * @param messageResponseData The data to send with the message response.  This data will be used to construct
      *  a post to the correct channel.
      */
-    public async sendMessageResponse(slackRequestData: Record<string, any>,
-                                     messageResponseData: any): Promise<ISlackMessageResponse> {
+    public async sendMessageResponse(slackRequestData: Record<string, any>, messageResponseData: any): Promise<ISlackMessageResponse> {
 
         const responseUrl = slackRequestData.response_url;
         if (!responseUrl) {
