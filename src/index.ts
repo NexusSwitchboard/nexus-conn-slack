@@ -451,11 +451,11 @@ export class SlackConnection extends Connection {
                 async (payload) => {
                     handler.handler(this, payload).catch((err) => logger("options handler failed: " + err.toString()));
                 });
-        // } else if (handler.type === SlackInteractionType.shortcut) {
-        //     this.messageAdapter.shortcut(handler.matchingConstraints as OptionsConstraints,
-        //         async (payload) => {
-        //             handler.handler(this, payload).catch((err) => logger("options handler failed: " + err.toString()));
-        //         });
+        } else if (handler.type === SlackInteractionType.shortcut) {
+            this.messageAdapter.shortcut(handler.matchingConstraints as OptionsConstraints,
+                async (payload) => {
+                    handler.handler(this, payload).catch((err) => logger("shortcut handler failed: " + err.toString()));
+                });
         } else if (handler.type === SlackInteractionType.viewClosed) {
             this.messageAdapter.viewClosed(handler.matchingConstraints as ViewConstraints,
                 async (payload) => {
