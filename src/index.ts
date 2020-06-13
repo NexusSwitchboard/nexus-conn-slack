@@ -39,6 +39,7 @@ export interface ISlackAckResponse {
     response_type?: string;
     replace_original?: boolean;
     errors?: Record<string, any>;
+    views?: any;
 }
 
 export interface ISlackMessageResponse {
