@@ -1,6 +1,6 @@
 {
   "name": "@nexus-switchboard/nexus-conn-slack",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "keywords": [
     "nexus-connection"
   ],
@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@nexus-switchboard/nexus-extend": "^0.5.11",
+    "@nexus-switchboard/nexus-core": "^0.6.0",
     "@slack/events-api": "^2.3.2",
     "@slack/interactive-messages": "^1.6.0",
     "@slack/web-api": "^5.8.1",
