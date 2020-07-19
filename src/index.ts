@@ -12,7 +12,7 @@ import { WebClient } from "@slack/web-api";
 import { IncomingWebhook } from "@slack/webhook";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { Router, Application } from "express";
-import { Connection, ConnectionConfig, GlobalConfig, findProperty } from "@nexus-switchboard/nexus-extend";
+import { Connection, ConnectionConfig, GlobalConfig, findProperty } from "@nexus-switchboard/nexus-core";
 import { createCommandAdapter, SlackCommandAdapter } from "./slackCommandAdapter";
 
 import createDebug from "debug";
