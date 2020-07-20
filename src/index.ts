@@ -127,7 +127,7 @@ export type SlackWebApiResponse = Record<string, any>;
  */
 export class SlackConnection extends Connection {
 
-    public name = "Slack";
+    public name = "nexus-conn-slack";
     public config: ISlackAppConfig;
     public eventAdapter: SlackEventAdapter;
     public messageAdapter: SlackMessageAdapter;
